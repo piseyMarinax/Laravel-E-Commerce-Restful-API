@@ -4,7 +4,9 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use GuzzleHttp\Psr7\response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Handler extends ExceptionHandler
 {
     /**
@@ -46,6 +48,24 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+         
+         if($request->expectsJson()){
+            // show error json formart
+            if($exception instanceof ModelNotFoundException)
+            {
+                return response()->json([
+                    'error' => "Product not not found"
+                ],404);
+            }
+            // show error route link
+            if( $exception instanceof NotFoundHttpException){
+                 return response()->json([
+                    'error' => "Incorrect route"
+                ],404);
+            }
+        }
+        
+       
         return parent::render($request, $exception);
     }
 }
