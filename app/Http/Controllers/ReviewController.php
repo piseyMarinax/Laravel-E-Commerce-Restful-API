@@ -6,6 +6,8 @@ use App\Model\Review;
 use App\Model\Product;
 use App\Http\Resources\Review\ReviewResource;
 use Illuminate\Http\Request;
+use GuzzleHttp\Psr7\response;
+use App\Http\Requests\ReviewRequest;
 
 class ReviewController extends Controller
 {
@@ -35,9 +37,17 @@ class ReviewController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ReviewRequest $request,Product $product)
     {
-        //
+        // create review object
+        $review = new Review($request->all());
+
+        // save review to product
+        $product->reviews()->save($review);
+
+        return response([
+            'data' => new ReviewResource($product),
+        ])->setStatusCode(201, 'The resource is created successfully!');;
     }
 
     /**
